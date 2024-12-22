@@ -1,35 +1,32 @@
-name: CI Pipeline
+name: Deploy to Heroku
 
 on:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
-      - main
+      - main  # You can adjust this to deploy on other branches as well.
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
+      # Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'  # Adjust based on your Node.js version
+      # Set up Node.js (or the appropriate environment for your app)
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Use the appropriate Node.js version
 
-    - name: Install Dependencies
-      run: npm install
+      # Install dependencies (if it's a Node.js app)
+      - name: Install dependencies
+        run: npm install
 
-    - name: Run Tests
-      run: npm test  # Adjust this command based on your testing setup
-
-    - name: Upload Test Results
-      if: failure()
-      uses: actions/upload-artifact@v2
-      with:
-        name: test-results
-        path: ./test-results/
+      # Deploy to Heroku
+      - name: Deploy to Heroku
+        run: |
+          git remote add heroku https://git.heroku.com/YOUR_APP_NAME.git
+          git push heroku main
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}  # Add your Heroku API key here as a secret
